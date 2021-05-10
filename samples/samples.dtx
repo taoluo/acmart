@@ -1,4 +1,3 @@
-%<*manuscript|acmsmall|acmsmall-submission|acmlarge|acmtog|sigconf|authordraft|sigplan|sigchi|sigchi-a|acmsmall-conf>
 %%
 %% 
 %% Commands for TeXCount
@@ -27,6 +26,8 @@
 %<sigchi>\documentclass[sigchi]{acmart}
 %<sigchi-a>\documentclass[sigchi-a, nonacm]{acmart}
 
+%<tagged>\usepackage{acmart-tagging}
+
 %%
 %% \BibTeX command to typeset BibTeX logo in the docs
 \AtBeginDocument{%
@@ -44,7 +45,7 @@
 \acmYear{2018}
 \acmDOI{10.1145/1122445.1122456}
 
-%</manuscript|acmsmall|acmsmall-submission|acmlarge|acmtog|sigconf|authordraft|sigplan|sigchi|sigchi-a|acmsmall-conf>
+
 %<*manuscript|sigconf|authordraft|sigplan|sigchi|sigchi-a|acmsmall-conf>
 %% These commands are for a PROCEEDINGS abstract or paper.
 \acmConference[Woodstock '18]{Woodstock '18: ACM Symposium on Neural
@@ -66,7 +67,6 @@
 \acmArticle{111}
 \acmMonth{8}
 %</acmsmall|acmsmall-submission|acmlarge|acmtog>
-%<*manuscript|acmsmall|acmsmall-submission|acmlarge|acmtog|sigconf|authordraft|sigplan|sigchi|sigchi-a|acmsmall-conf>
 
 
 %%
@@ -236,7 +236,7 @@
 %% the work being presented. Separate the keywords with commas.
 \keywords{datasets, neural networks, gaze detection, text tagging}
 
-%</manuscript|acmsmall|acmsmall-submission|acmlarge|acmtog|sigconf|authordraft|sigplan|sigchi|sigchi-a|acmsmall-conf>
+
 %<*sigconf|authordraft|sigplan|acmsmall-conf>
 %% A "teaser" image appears between the author and affiliation
 %% information and the body of the document, and typically spans the
@@ -249,7 +249,6 @@
   \label{fig:teaser}
 \end{teaserfigure}
 %</sigconf|authordraft|sigplan|acmsmall-conf>
-%<*manuscript|acmsmall|acmsmall-submission|acmlarge|acmtog|sigconf|authordraft|sigplan|sigchi|sigchi-a|acmsmall-conf>
 
 %%
 %% This command processes the author and affiliation and title
@@ -801,4 +800,4 @@ rhoncus. Maecenas eu arcu ac neque placerat aliquam. Nunc pulvinar
 massa et mattis lacinia.
 
 \end{document}
-%</manuscript|acmsmall|acmsmall-submission|acmlarge|acmtog|sigconf|authordraft|sigplan|sigchi|sigchi-a|acmsmall-conf>
+

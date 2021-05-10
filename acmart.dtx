@@ -107,6 +107,7 @@
 %  John Collins,
 %  Nils Anders Danielsson,
 %  Michael Ekstrand,
+%  Ulrike Fischer,
 %  Matthew Fluet,
 %  Paolo G.~Giarrusso,
 %  Ben Greenman,
@@ -414,7 +415,9 @@
 %                        mode\\
 %     pbalance & false & Whether to balance the last page in two column
 %                        mode using pbalance package\\
-%     urlbreakonhyphens & true & Whether to break urls on hyphens\\ 
+%     urlbreakonhyphens & true & Whether to break urls on hyphens\\
+%     tagging & false & Whether to enable tagging interface, see
+%     Section~\ref{sec:ug_accessibility}\\   
 %     \bottomrule
 %   \end{tabularx}
 % \end{table}
@@ -1243,8 +1246,12 @@
 % into a \cs{minipage} of the width \cs{columnwidth}.
 %
 %
-%\subsection{Descriptions of images}
-%\label{sec:descriptions}
+%\subsection{Accessibility features}
+%\label{sec:ug_accessibility}
+%
+%  ACM strives to provide the full accessibility features for visually
+%  challenged users.  There are both production ready and experimental
+%  features for this.
 %
 % \DescribeMacro{\Description}%
 % Some readers of ACM publications might be visually challenged.
@@ -1269,7 +1276,11 @@
 % \end{figure}
 % \end{verbatim}
 % At present the lack of descriptions generates a warning at
-% compilation.  
+% compilation.
+%
+% Experimental features for PDF tagging are described below in
+% Section~\ref{sec:ug_accessibility}.  Note that you need kernel newer
+% than 2020 to use them.
 %
 %\subsection{Theorems}
 %\label{sec:ug_theorems}
@@ -1912,6 +1923,20 @@
 % \item |figure*|: \cs{fulltextwidth}.
 % \end{enumerate}
 % 
+%
+%\subsection{Experimental accessibility features}
+%\label{sec:ug_accessibility}
+%
+% Experimental accessbility features are based on the code by Ulrike
+% Fischer.  They consist of two parts:
+% \begin{enumerate}
+% \item Hooks for tagging.  They are activated by the switch
+% |tagging=true| in the class options.  The hooks are agnostic about
+% the tagging implementation and should be quite robust.
+% \item Package |acmart-tagging|, which must be activated by the
+% standard \cs{usepackage} call.  It uses an experimental package
+% |tagging| and may break things.
+% \end{enumerate}
 % 
 %
 % \StopEventually{
@@ -1932,12 +1957,12 @@
 % driver code in a separate~|.drv| driver file.  We roll this code into the
 % main file and use the pseudo-guard |<gobble>| for it.
 %    \begin{macrocode}
-%<class>\NeedsTeXFormat{LaTeX2e}
+%<class|acmart-tagging>\NeedsTeXFormat{LaTeX2e}
 %<*gobble>
 \ProvidesFile{acmart.dtx}
 %</gobble>
 %<class>\ProvidesClass{acmart}
-[2021/05/01 v1.78 Typesetting articles for the Association for Computing Machinery]
+%<!acmart-tagging>[2021/05/09 v1.78 Typesetting articles for the Association for Computing Machinery]
 %    \end{macrocode}
 %
 % \changes{v1.00}{2016/04/14}{First released version}
@@ -2339,6 +2364,22 @@
 %
 % \end{macro}
 %
+% \begin{macro}{\if@ACM@tagging}
+% \changes{v1.78}{2021/05/09}{Added macro}
+%   Whether we use tagging code
+%    \begin{macrocode}
+\define@boolkey+{acmart.cls}[@ACM@]{tagging}[true]{%
+  \if@ACM@tagging
+    \PackageInfo{\@classname}{Using experimental tagging hooks}%
+  \else
+    \PackageInfo{\@classname}{Not using experimental tagging hooks}%
+  \fi}{\PackageError{\@classname}{The option tagging can be either true or
+    false}}
+\ExecuteOptionsX{tagging=false}
+%    \end{macrocode}
+%
+% \end{macro}
+%
 %
 % \changes{v1.01}{2016/04/18}{Explicitly put draft option
 % (closes \url{https://github.com/borisveytsman/acmart/issues/4})}
@@ -2454,7 +2495,7 @@
 \fi
 %    \end{macrocode}
 %
-%
+% 
 %
 %\subsection{Loading the base class and package}
 %\label{sec:loading}
@@ -7504,6 +7545,32 @@
 %    \begin{macrocode}
 \normalsize\normalfont\frenchspacing
 %</class>
+%    \end{macrocode}
+%
+%
+%\subsection{Experimental tagging code}
+%\label{sec:tagging}
+%
+% The begginging
+%    \begin{macrocode}
+%<*acmart-tagging>
+\ProvidesPackage{acmart-tagging}
+[2021/05/09 v0.01 Tagging for acmart (based on Ulrike Fisher's code)]
+%    \end{macrocode}
+%
+% We check that \cs{if@ACM@tagging} is defined, and set it to true.
+%    \begin{macrocode}
+\ifx\if@ACM@tagging\@undefined
+\PackageError{acmart-tagging}{This package works only with acmart
+  class}{Package acmart-tagging is intended to use with acmart
+  version 1.78 or newer.  You might want to delete its invocation}
+\fi
+\@ACM@taggingtrue
+%    \end{macrocode}
+% 
+%
+%    \begin{macrocode}
+%</acmart-tagging>
 %    \end{macrocode}
 %
 %\Finale

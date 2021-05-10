@@ -35,6 +35,8 @@ acmguide.pdf: $(PACKAGE).dtx $(PACKAGE).cls
 %.cls:   %.ins %.dtx
 	pdflatex $<
 
+acmart-tagging.sty: acmart.ins acmart.dtx
+	pdflatex $<
 
 ALLSAMPLES:
 	cd samples; pdflatex samples.ins; cd ..
@@ -48,9 +50,10 @@ samples/%: %
 
 
 samples/$(PACKAGE).cls: $(PACKAGE).cls
+samples/%.sty: %.sty
 samples/ACM-Reference-Format.bst: ACM-Reference-Format.bst
 
-samples/%.pdf:  samples/%.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst
+samples/%.pdf:  samples/%.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst samples/acmart-tagging.sty
 	cd $(dir $@) && pdflatex-dev $(notdir $<)
 	- cd $(dir $@) && bibtex $(notdir $(basename $<))
 	cd $(dir $@) && pdflatex-dev $(notdir $<)
@@ -58,7 +61,7 @@ samples/%.pdf:  samples/%.tex   samples/$(PACKAGE).cls samples/ACM-Reference-For
 	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $(basename $<).log) \
 	  do cd $(dir $@) && pdflatex-dev $(notdir $<); done
 
-samples/sample-xelatex.pdf:  samples/sample-xelatex.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst
+samples/sample-xelatex.pdf:  samples/sample-xelatex.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst samples/acmart-tagging.sty
 	cd $(dir $@) && xelatex-dev $(notdir $<)
 	- cd $(dir $@) && bibtex $(notdir $(basename $<))
 	cd $(dir $@) && xelatex-dev $(notdir $<)
@@ -66,7 +69,7 @@ samples/sample-xelatex.pdf:  samples/sample-xelatex.tex   samples/$(PACKAGE).cls
 	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $(basename $<).log) \
 	  do cd $(dir $@) && xelatex-dev $(notdir $<); done
 
-samples/sample-lualatex.pdf:  samples/sample-lualatex.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst
+samples/sample-lualatex.pdf:  samples/sample-lualatex.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst samples/acmart-tagging.sty
 	cd $(dir $@) && lualatex-dev $(notdir $<)
 	- cd $(dir $@) && bibtex $(notdir $(basename $<))
 	cd $(dir $@) && lualatex-dev $(notdir $<)
@@ -76,7 +79,7 @@ samples/sample-lualatex.pdf:  samples/sample-lualatex.tex   samples/$(PACKAGE).c
 
 
 
-.PRECIOUS:  $(PACKAGE).cfg $(PACKAGE).cls
+.PRECIOUS:  $(PACKAGE).cfg $(PACKAGE).cls 
 
 docclean:
 	$(RM)  *.log *.aux \
@@ -91,7 +94,7 @@ docclean:
 
 
 clean: docclean
-	$(RM)  $(PACKAGE).cls \
+	$(RM)  $(PACKAGE).cls acmart-tagging.sty \
 	samples/*.tex
 
 distclean: clean
@@ -107,6 +110,6 @@ zip:  all clean
 	zip -r  $(PACKAGE).zip * -x '*~' -x '*.tgz' -x '*.zip' -x CVS -x 'CVS/*'
 
 documents.zip: all docclean
-	zip -r $@ acmart.pdf acmguide.pdf samples *.cls ACM-Reference-Format.*
+	zip -r $@ acmart.pdf acmguide.pdf samples *.cls ACM-Reference-Format.* *.sty
 
 .PHONY: all ALLSAMPLES docclean clean distclean archive zip
