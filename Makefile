@@ -38,45 +38,10 @@ acmguide.pdf: $(PACKAGE).dtx $(PACKAGE).cls
 acmart-tagging.sty: acmart.ins acmart.dtx
 	pdflatex $<
 
-ALLSAMPLES:
-	cd samples; pdflatex samples.ins; cd ..
-	for texfile in samples/*.tex; do \
-		pdffile=$${texfile%.tex}.pdf; \
-		${MAKE} $$pdffile; \
-	done
+ALLSAMPLES: samples/timestamp;
 
-samples/%: %
-	cp $^ samples
-
-
-samples/$(PACKAGE).cls: $(PACKAGE).cls
-samples/%.sty: %.sty
-samples/ACM-Reference-Format.bst: ACM-Reference-Format.bst
-
-samples/%.pdf:  samples/%.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst samples/acmart-tagging.sty
-	cd $(dir $@) && pdflatex-dev $(notdir $<)
-	- cd $(dir $@) && bibtex $(notdir $(basename $<))
-	cd $(dir $@) && pdflatex-dev $(notdir $<)
-	cd $(dir $@) && pdflatex-dev $(notdir $<)
-	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $(basename $<).log) \
-	  do cd $(dir $@) && pdflatex-dev $(notdir $<); done
-
-samples/sample-xelatex.pdf:  samples/sample-xelatex.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst samples/acmart-tagging.sty
-	cd $(dir $@) && xelatex-dev $(notdir $<)
-	- cd $(dir $@) && bibtex $(notdir $(basename $<))
-	cd $(dir $@) && xelatex-dev $(notdir $<)
-	cd $(dir $@) && xelatex-dev $(notdir $<)
-	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $(basename $<).log) \
-	  do cd $(dir $@) && xelatex-dev $(notdir $<); done
-
-samples/sample-lualatex.pdf:  samples/sample-lualatex.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst samples/acmart-tagging.sty
-	cd $(dir $@) && lualatex-dev $(notdir $<)
-	- cd $(dir $@) && bibtex $(notdir $(basename $<))
-	cd $(dir $@) && lualatex-dev $(notdir $<)
-	cd $(dir $@) && lualatex-dev $(notdir $<)
-	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $(basename $<).log) \
-	  do cd $(dir $@) && lualatex-dev $(notdir $<); done
-
+samples/%:
+	cd samples; ${MAKE} $(notdir $@); cd ..
 
 
 .PRECIOUS:  $(PACKAGE).cfg $(PACKAGE).cls 
@@ -89,7 +54,8 @@ docclean:
 	*.dvi *.ps *.thm *.tgz *.zip *.rpi \
 	samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst \
 	samples/*.log samples/*.aux samples/*.out \
-	samples/*.bbl samples/*.blg samples/*.cut 
+	samples/*.bbl samples/*.blg samples/*.cut \
+	samples/acmart-tagging.sty samples/timestamp
 
 
 

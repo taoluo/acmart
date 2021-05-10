@@ -15,8 +15,9 @@
 % The Current Maintainer of this work is Boris Veytsman,
 % <borisv@lk.net>
 %
-% This work consists of the file acmart.dtx, the derived file
-% acmart.cls, the files ACM-Reference-Format.bst, and templates
+% This work consists of the file acmart.dtx, the derived files
+% acmart.cls, acmart-tagging.sty,
+% the files ACM-Reference-Format.bst, and templates
 % sample-acmlarge.tex, sample-acmsmall.tex, sample-acmtog.tex,
 % samplebody-conf.tex, samplebody-journals.tex, sample-manuscript.tex,
 % sample-sigconf-authordraft.tex, sample-sigconf.tex,
@@ -7566,6 +7567,13 @@
   version 1.78 or newer.  You might want to delete its invocation}
 \fi
 \@ACM@taggingtrue
+%    \end{macrocode}
+%
+% Setting up required packages:
+%    \begin{macrocode}
+\RequirePackage{tagpdf}
+\RequirePackage{array}
+\tagpdfsetup{activate-all,paratagging,interwordspace=true}
 %    \end{macrocode}
 % 
 %
