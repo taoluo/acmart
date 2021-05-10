@@ -3,6 +3,7 @@ acmart-tagging.sty
 acmart.pdf
 acmguide.pdf
 samples/sample-*.pdf
+samples/timestamp
 *.log
 *.aux
 *.cfg
