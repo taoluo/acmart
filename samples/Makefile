@@ -1,6 +1,6 @@
 PACKAGE=acmart
 
-timestamp: samples.dtx samples.ins
+timestamp: samples.dtx samples.ins acmart.cls acmart-tagging.sty ACM-Reference-Format.bst 
 	pdflatex samples.ins
 	for texfile in *.tex; do \
 	pdffile=$${texfile%.tex}.pdf; \
@@ -9,13 +9,13 @@ timestamp: samples.dtx samples.ins
 	touch timestamp
 
 %.cls: ../%.cls
-	cp $< .
+	ln -s $< .
 
 %.sty: ../%.sty
-	cp $< .
+	ln -s $< .
 
 %.bst: ../%.bst
-	cp $< .
+	ln -s $< .
 
 
 %.pdf:  %.tex   $(PACKAGE).cls ACM-Reference-Format.bst 

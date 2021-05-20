@@ -7596,7 +7596,34 @@
 %    \begin{macrocode}
 \RequirePackage{tagpdf}
 \RequirePackage{array}
-\tagpdfsetup{activate-all,interwordspace=true}
+\tagpdfsetup{activate-all,paratagging,interwordspace=true}
+%    \end{macrocode}
+%
+% Some tags
+%    \begin{macrocode}
+\tagpdfsetup{ add-new-tag=Title/H1,add-new-tag=Author/P}
+\tagpdfsetup{ add-new-tag=footnotemark/Lbl}
+\tagpdfsetup{ add-new-tag=footnoteLbl/Lbl}
+\tagpdfsetup{newattribute={TH-col}{/O/Table/Scope/Column},
+             newattribute={TH-row}{/O/Table/Scope/Row},}
+%    \end{macrocode}
+%
+% Rightarrow
+%    \begin{macrocode}
+%\pdfvariable gentounicode =1
+%\pdfextension glyphtounicode{arrowright}{2192}
+%    \end{macrocode}
+%
+% Acmart, following amsart, uses math bullet for itemization.  Here we
+% redefine it:
+%    \begin{macrocode}
+\def\labelitemi{\textbullet}
+%    \end{macrocode}
+%
+% Document structure
+%    \begin{macrocode}
+\AddToHook{begindocument/end}{\tagstructbegin{tag=Document}}
+\AddToHook{enddocument/afterlastpage}{\tagstructend}
 %    \end{macrocode}
 % 
 %

@@ -38,9 +38,10 @@ acmguide.pdf: $(PACKAGE).dtx $(PACKAGE).cls
 acmart-tagging.sty: acmart.ins acmart.dtx
 	pdflatex $<
 
-ALLSAMPLES: samples/timestamp;
+ALLSAMPLES: 
+	cd samples; ${MAKE} timestamp; cd ..
 
-samples/%:
+samples/%: 
 	cd samples; ${MAKE} $(notdir $@); cd ..
 
 
