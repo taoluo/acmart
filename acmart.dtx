@@ -417,8 +417,6 @@
 %     pbalance & false & Whether to balance the last page in two column
 %                        mode using pbalance package\\
 %     urlbreakonhyphens & true & Whether to break urls on hyphens\\
-%     tagging & false & Whether to enable tagging interface, see
-%     Section~\ref{sec:ug_accessibility}\\   
 %     \bottomrule
 %   \end{tabularx}
 % \end{table}
@@ -1931,14 +1929,19 @@
 % Experimental accessbility features are based on the code by Ulrike
 % Fischer.  They consist of two parts:
 % \begin{enumerate}
-% \item Hooks for tagging.  They are activated by the switch
-% |tagging=true| in the class options.  The hooks are agnostic about
+% \item Hooks for tagging.  The hooks are agnostic about
 % the tagging implementation and should be quite robust.
 % \item Package |acmart-tagging|, which must be activated by the
 % standard \cs{usepackage} call.  It uses an experimental package
 % |tagging| and may break things.
 % \end{enumerate}
-% 
+%
+% We define the hooks described below.  Note that end hooks are
+% actually reversed hooks (executed in the reverse order by default).
+%
+% \DescribeMacro{acmart/headfootStart}%
+% \DescribeMacro{acmart/headfootEnd}%
+% Beginnig and end of pagination.
 %
 % \StopEventually{
 % \clearpage
@@ -2365,21 +2368,6 @@
 %
 % \end{macro}
 %
-% \begin{macro}{\if@ACM@tagging}
-% \changes{v1.78}{2021/05/09}{Added macro}
-%   Whether we use tagging code
-%    \begin{macrocode}
-\define@boolkey+{acmart.cls}[@ACM@]{tagging}[true]{%
-  \if@ACM@tagging
-    \PackageInfo{\@classname}{Using experimental tagging hooks}%
-  \else
-    \PackageInfo{\@classname}{Not using experimental tagging hooks}%
-  \fi}{\PackageError{\@classname}{The option tagging can be either true or
-    false}}
-\ExecuteOptionsX{tagging=false}
-%    \end{macrocode}
-%
-% \end{macro}
 %
 %
 % \changes{v1.01}{2016/04/18}{Explicitly put draft option
@@ -2496,9 +2484,38 @@
 \fi
 %    \end{macrocode}
 %
-% 
 %
-%\subsection{Loading the base class and package}
+%\subsection{Tagging hooks}
+%\label{sec:tagging_hooks}
+%
+% We use lthooks interface.  However, since there are old
+% installations in production, we disable the interface for them.
+%    \begin{macrocode}
+\IfFormatAtLeastTF{2021/01/01}{%
+  \PackageInfo{\@classname}{Tagging enabled}}{%
+  \PackageWarning{\@classname}{Tagging disabled.  \MessageBreak
+    Please update your LaTeX installation \MessageBreak
+    if you want to use tagging interface}%
+  \providecommand{\NewHook}[1]{}%
+  \providecommand{\NewReversedHook}[1]{}%
+  \providecommand{\NewMirroredHookPair}[2]{}%
+  \providecommand{\UseHook}[1]{}%
+}    
+%    \end{macrocode}
+%
+% \begin{macro}{acmart/headfootStart}
+% \changes{vTAGGING}{2021/05/22}{Introduced macro}
+% \begin{macro}{acmart/headfootEnd}
+% \changes{vTAGGING}{2021/05/22}{Introduced macro}
+% Head or foot start or end.
+%    \begin{macrocode}
+\NewMirroredHookPair{./headfootStart}{./headfootEnd}
+%    \end{macrocode}
+% 
+% \end{macro}
+% \end{macro}
+%
+% \subsection{Loading the base class and package}
 %\label{sec:loading}
 %
 % \changes{v1.13}{2016/06/06}{Increased font size for ACM Large}
@@ -6673,6 +6690,7 @@
 % \changes{v1.59}{2019/04/20}{Moved page styles to \cs{AtBeginDocument}}
 % \changes{v1.76}{2021/02/21}{Fixed bug with no line numbers for nonacm}
 %   The page style for all pages but the first one
+% \changes{vTAGGING}{2021/05/23}{Added tagging}
 %    \begin{macrocode}
 \AtBeginDocument{%
 \fancypagestyle{standardpagestyle}{%
@@ -6851,6 +6869,7 @@
 % journal format}
 % \changes{v1.59}{2019/04/20}{Moved page styles to \cs{AtBeginDocument}}
 %   The page style for the first page only.
+% \changes{vTAGGING}{2021/05/23}{Added tagging}
 %    \begin{macrocode}
 \AtBeginDocument{%
 \fancypagestyle{firstpagestyle}{%
@@ -6860,57 +6879,81 @@
   \if@ACM@journal@bibstrip
     \ifcase\ACM@format@nr
     \relax % manuscript
-      \fancyhead[L]{\ACM@linecountL}%
-      \fancyfoot[RO,LE]{\if@ACM@printfolios\small\thepage\fi}%
+    \fancyhead[L]{\UseHook{acmart/headfootStart}%
+      \ACM@linecountL\UseHook{acmart/headfootEnd}}%
+    \fancyfoot[RO,LE]{\UseHook{acmart/headfootStart}%
+      \if@ACM@printfolios\small\thepage\fi\UseHook{acmart/headfootEnd}}%
       \if@ACM@nonacm\else%
-        \fancyfoot[RE,LO]{\footnotesize Manuscript submitted to ACM}%
+      \fancyfoot[RE,LO]{\UseHook{acmart/headfootStart}%
+        \footnotesize Manuscript submitted to ACM\UseHook{acmart/headfootEnd}}%
       \fi%
     \or % acmsmall
       \if@ACM@nonacm\else%
-        \fancyfoot[RO,LE]{\footnotesize \@journalNameShort, Vol. \@acmVolume, No.
+      \fancyfoot[RO,LE]{\UseHook{acmart/headfootStart}%
+        \footnotesize \@journalNameShort, Vol. \@acmVolume, No.
         \@acmNumber, Article \@acmArticle.  Publication date:
-        \@acmPubDate.}%
+        \@acmPubDate.\UseHook{acmart/headfootEnd}}%
       \fi%
-      \fancyhead[LE]{\ACM@linecountL\@folioblob}%
-      \fancyhead[LO]{\ACM@linecountL}%
-      \fancyhead[RO]{\@folioblob}%
-      \fancyheadoffset[RO,LE]{0.6\@folio@wd}%
+      \fancyhead[LE]{\UseHook{acmart/headfootStart}%
+        \ACM@linecountL\@folioblob\UseHook{acmart/headfootEnd}}%
+      \fancyhead[LO]{\UseHook{acmart/headfootStart}%
+        \ACM@linecountL\UseHook{acmart/headfootEnd}}%
+      \fancyhead[RO]{\UseHook{acmart/headfootStart}%
+        \@folioblob\UseHook{acmart/headfootEnd}}%
+      \fancyheadoffset[RO,LE]{\UseHook{acmart/headfootStart}%
+        0.6\@folio@wd\UseHook{acmart/headfootEnd}}%
     \or % acmlarge
       \if@ACM@nonacm\else%
-        \fancyfoot[RO,LE]{\footnotesize \@journalNameShort, Vol. \@acmVolume, No.
+      \fancyfoot[RO,LE]{\UseHook{acmart/headfootStart}%
+        \footnotesize \@journalNameShort, Vol. \@acmVolume, No.
         \@acmNumber, Article \@acmArticle.  Publication date:
-        \@acmPubDate.}%
+        \@acmPubDate.\UseHook{acmart/headfootEnd}}%
       \fi%
-      \fancyhead[RO]{\@folioblob}%
-      \fancyhead[LE]{\ACM@linecountL\@folioblob}%
-      \fancyhead[LO]{\ACM@linecountL}%
-      \fancyheadoffset[RO,LE]{1.4\@folio@wd}%
+      \fancyhead[RO]{\UseHook{acmart/headfootStart}%
+        \@folioblob\UseHook{acmart/headfootEnd}}%
+      \fancyhead[LE]{\UseHook{acmart/headfootStart}%
+        \ACM@linecountL\@folioblob\UseHook{acmart/headfootEnd}}%
+      \fancyhead[LO]{\UseHook{acmart/headfootStart}%
+        \ACM@linecountL\UseHook{acmart/headfootEnd}}%
+      \fancyheadoffset[RO,LE]{\UseHook{acmart/headfootStart}%
+        1.4\@folio@wd\UseHook{acmart/headfootEnd}}%
     \or % acmtog
       \if@ACM@nonacm\else%
-        \fancyfoot[RO,LE]{\footnotesize \@journalNameShort, Vol. \@acmVolume, No.
+      \fancyfoot[RO,LE]{\UseHook{acmart/headfootStart}%
+        \footnotesize \@journalNameShort, Vol. \@acmVolume, No.
         \@acmNumber, Article \@acmArticle.  Publication date:
-        \@acmPubDate.}%
+        \@acmPubDate.\UseHook{acmart/headfootEnd}}%
       \fi%
-      \fancyhead[L]{\ACM@linecountL}%
-      \fancyhead[R]{\ACM@linecountR}%
+      \fancyhead[L]{\UseHook{acmart/headfootStart}%
+        \ACM@linecountL\UseHook{acmart/headfootEnd}}%
+      \fancyhead[R]{\UseHook{acmart/headfootStart}%
+        \ACM@linecountR\UseHook{acmart/headfootEnd}}%
     \else % Conference proceedings
-      \fancyhead[L]{\ACM@linecountL}%
-      \fancyhead[R]{\ACM@linecountR}%
-      \fancyfoot[C]{\if@ACM@printfolios\footnotesize\thepage\fi}%
+    \fancyhead[L]{\UseHook{acmart/headfootStart}%
+      \ACM@linecountL\UseHook{acmart/headfootEnd}}%
+    \fancyhead[R]{\UseHook{acmart/headfootStart}%
+      \ACM@linecountR\UseHook{acmart/headfootEnd}}%
+    \fancyfoot[C]{\UseHook{acmart/headfootStart}%
+      \if@ACM@printfolios\footnotesize\thepage\fi\UseHook{acmart/headfootEnd}}%
     \fi
   \else
-    \fancyhead[L]{\ACM@linecountL}%
-    \fancyhead[R]{\ACM@linecountR}%
-    \fancyfoot[C]{\if@ACM@printfolios\footnotesize\thepage\fi}%
+  \fancyhead[L]{\UseHook{acmart/headfootStart}%
+    \ACM@linecountL\UseHook{acmart/headfootEnd}}%
+  \fancyhead[R]{\UseHook{acmart/headfootStart}%
+    \ACM@linecountR\UseHook{acmart/headfootEnd}}%
+  \fancyfoot[C]{\UseHook{acmart/headfootStart}%
+    \if@ACM@printfolios\footnotesize\thepage\fi\UseHook{acmart/headfootEnd}}%
   \fi
   \if@ACM@timestamp
     \ifnum\ACM@format@nr=0\relax % Manuscript
-    \fancyfoot[LO,RE]{\ACM@timestamp\quad
+    \fancyfoot[LO,RE]{\UseHook{acmart/headfootStart}%
+      \ACM@timestamp\quad
       \if@ACM@nonacm\else
         \footnotesize Manuscript submitted to ACM
-      \fi}
+      \fi\UseHook{acmart/headfootEnd}}
     \else
-    \fancyfoot[LO,RE]{\ACM@timestamp}
+    \fancyfoot[LO,RE]{\UseHook{acmart/headfootStart}%
+      \ACM@timestamp\UseHook{acmart/headfootEnd}}
     \fi
   \fi
 }}
@@ -7582,15 +7625,6 @@
 [2021/05/09 v0.01 Tagging for acmart (based on Ulrike Fisher's code)]
 %    \end{macrocode}
 %
-% We check that \cs{if@ACM@tagging} is defined, and set it to true.
-%    \begin{macrocode}
-\ifx\if@ACM@tagging\@undefined
-\PackageError{acmart-tagging}{This package works only with acmart
-  class}{Package acmart-tagging is intended to use with acmart
-  version 1.78 or newer.  You might want to delete its invocation}
-\fi
-\@ACM@taggingtrue
-%    \end{macrocode}
 %
 % Setting up required packages:
 %    \begin{macrocode}
@@ -7624,6 +7658,14 @@
 %    \begin{macrocode}
 \AddToHook{begindocument/end}{\tagstructbegin{tag=Document}}
 \AddToHook{enddocument/afterlastpage}{\tagstructend}
+%    \end{macrocode}
+% 
+% Headings and footers
+%    \begin{macrocode}
+\AddToHook{acmart/headfootStart}{%
+  \tagpdfparaOff\tagmcbegin{artifact=pagination}}
+\AddToHook{acmart/headfootEnd}{%
+  \tagmcend\tagpdfparaOn}
 %    \end{macrocode}
 % 
 %

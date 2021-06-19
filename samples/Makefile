@@ -18,6 +18,9 @@ timestamp: samples.dtx samples.ins acmart.cls acmart-tagging.sty ACM-Reference-F
 	ln -s $< .
 
 
+%.tex: samples.dtx samples.ins
+	pdflatex samples.ins
+
 %.pdf:  %.tex   $(PACKAGE).cls ACM-Reference-Format.bst 
 	cd $(dir $@) && pdflatex-dev $<
 	- cd $(dir $@) && bibtex $(basename $<)
@@ -46,9 +49,9 @@ sample-lualatex.pdf:  sample-lualatex.tex   $(PACKAGE).cls ACM-Reference-Format.
 #  The tagged code is experimental;  expect breaking...
 #
 sample-sigconf-tagged.pdf: sample-sigconf-tagged.tex   $(PACKAGE).cls ACM-Reference-Format.bst acmart-tagging.sty
-	- cd $(dir $@) && pdflatex-dev -halt-on-error $<
+	- cd $(dir $@) && lualatex-dev -halt-on-error $<
 	- cd $(dir $@) && bibtex $(basename $<)
-	- cd $(dir $@) && pdflatex-dev -halt-on-error $<
-	- cd $(dir $@) && pdflatex-dev -halt-on-error $<
+	- cd $(dir $@) && lualatex-dev -halt-on-error $<
+	- cd $(dir $@) && lualatex-dev -halt-on-error $<
 	- while ( grep -q '^LaTeX Warning: Label(s) may have changed' $(basename $<).log) \
-	  do cd $(dir $@) && pdflatex-dev -halt-on-error $<; done
+	  do cd $(dir $@) && lualatex-dev -halt-on-error $<; done
